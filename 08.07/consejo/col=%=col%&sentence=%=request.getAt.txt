@@ -1,0 +1,124 @@
+col=<%=col%>&sentence=<%=request.getAttribute("sentence"%>& pageNumber<%=pageNumber%
+
+
+?col=<%=col%>&sentence=<%=sentence%>& pageNumber<%=pageNumber%>
+
+
+public ArrayList<BoardDTO> getList(int pageNumber) {
+		getConnection();
+		//String SQL = "SELECT COM_NUM, COM_TITLE, COM_CONTENT, NICKNAME, COM_DATE, COM_CATEGORY, COM_VIEWS FROM COMMUNITY WHERE COM_NUM < ? ORDER BY COM_NUM DESC FETCH FIRST 3 ROWS ONLY";
+		String SQL="SELECT COM_NUM, COM_TITLE, COM_CONTENT, NICKNAME, COM_DATE, COM_CATEGORY, COM_VIEWS FROM (SELECT * FROM COMMUNITY WHERE COM_NUM < ? order by COM_NUM desc) WHERE ROWNUM <=10";
+		ArrayList<BoardDTO> list = new ArrayList<BoardDTO>();
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, getNext() - (pageNumber -1) * 10);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				BoardDTO dto = new BoardDTO();
+				dto.setCom_Num(rs.getInt(1));
+				dto.setCom_Title(rs.getString(2));
+				dto.setCom_Content(rs.getString(3));
+				dto.setNickname(rs.getString(4));
+				dto.setCom_Date(rs.getString(5));
+				dto.setCom_Category(rs.getString(6));
+				dto.setCom_Views(rs.getInt(7)); 
+				list.add(dto);
+			}			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+
+
+
+<a href="view.jsp?com_Num=<%= list_Search.get(i).getCom_Num() %>"><%= list_Search.get(i).getCom_Title() %></a><
+
+
+
+
+
+
+
+
+
+
+
+<div style="position:relative; left:40px; font-size:20px; margin-top: 20px; text-align: center; height: 25px;">
+									<form action="search.jsp" method="get">
+										<select name="col">
+											<option value="title_content">제목+내용</option>
+											<option value="title">제목</option>
+											<option value="content">내용</option>
+											<option value="writer">작성자</option>
+										</select>
+					      				<input type="text" name="sentence" id="sentence" style="height:30px; ">
+					      				<input type="submit" value="검색" class="btn btn-primary" style="height:30px; text-align:center;">					     
+					    			 </form>
+					     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+else if("title".equals(col)){afr
+											ArrayList<BoardDTO> list_Search = dao.getList_Search_Title(sentence, pageNumber);
+											for (int i = 0; i < list_Search.size(); i++) { %>
+											<tr style ="background-color:white;">
+												<td><%= list_Search.get(i).getCom_Category() %></td>
+												<td><%= list_Search.get(i).getCom_Num() %></td>
+												<td><a href="view.jsp?com_Num=<%= list_Search.get(i).getCom_Num() %>"><%= list_Search.get(i).getCom_Title() %></a></td>
+												<td><%= list_Search.get(i).getNickname() %></td>
+												<td><%= list_Search.get(i).getCom_Date().substring(0, 11) + list_Search.get(i).getCom_Date().substring(11, 13) + ":" + list_Search.get(i).getCom_Date().substring(14, 16)  %></td>
+												<td><%= list_Search.get(i).getCom_Views() %></td>
+											</tr>
+											<%		
+												}
+											%>
+										<%}else if("content".equals(col)){
+											ArrayList<BoardDTO> list_Search = dao.getList_Search_Content(sentence, pageNumber);
+											for (int i = 0; i < list_Search.size(); i++) { %>
+											<tr style ="background-color:white;">
+												<td><%= list_Search.get(i).getCom_Category() %></td>
+												<td><%= list_Search.get(i).getCom_Num() %></td>
+												<td><a href="view.jsp?com_Num=<%= list_Search.get(i).getCom_Num() %>"><%= list_Search.get(i).getCom_Title() %></a></td>
+												<td><%= list_Search.get(i).getNickname() %></td>
+												<td><%= list_Search.get(i).getCom_Date().substring(0, 11) + list_Search.get(i).getCom_Date().substring(11, 13) + ":" + list_Search.get(i).getCom_Date().substring(14, 16)  %></td>
+												<td><%= list_Search.get(i).getCom_Views() %></td>
+											</tr>
+											<%		
+												}
+											%>
+										<%}else{
+											ArrayList<BoardDTO> list_Search = dao.getList_Search_Writer(sentence, pageNumber);
+											for (int i = 0; i < list_Search.size(); i++) { 
+											%>
+											<tr style ="background-color:white;">
+												<td><%= list_Search.get(i).getCom_Category() %></td>
+												<td><%= list_Search.get(i).getCom_Num() %></td>
+												<td><a href="view.jsp?com_Num=<%= list_Search.get(i).getCom_Num() %>"><%= list_Search.get(i).getCom_Title() %></a></td>
+												<td><%= list_Search.get(i).getNickname() %></td>
+												<td><%= list_Search.get(i).getCom_Date().substring(0, 11) + list_Search.get(i).getCom_Date().substring(11, 13) + ":" + list_Search.get(i).getCom_Date().substring(14, 16)  %></td>
+												<td><%= list_Search.get(i).getCom_Views() %></td>
+											</tr>
+											<%		
+
+
+
+
+
+
+AND (COM_TITLE  LIKE '준영' OR COM_CONTENT LIKE '준영');

@@ -1,0 +1,15 @@
+BoardDAO 
+
+<전체 글 보기>
+getList_Search_Title_Content
+
+<건의사항 글 보기>
+getListRequest_Search_Title_Content
+<취미생활 글 보기>
+getListHobby_Search_Title_Content
+<육아 글 보기>
+getListBaby_Search_Title_Content
+<찾아주세요 글 보기>
+getListFind_Search_Title_Content
+<동네맛집 글 보기>
+getListFood_Search_Title_Content

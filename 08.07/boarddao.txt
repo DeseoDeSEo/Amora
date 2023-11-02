@@ -1,0 +1,207 @@
+package model;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class BoardDAO {
+	// 기본값 null, 0로 설정
+	private Connection conn=null;
+	private PreparedStatement psmt=null;
+	private ResultSet rs= null;
+	
+	public void getConnection() {
+		
+	    try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+	    String db_url = "jdbc:oracle:thin:@project-db-stu3.smhrd.com:1524:xe";
+	    String db_id = "Insa4_Spring_hacksim_3";
+	    String db_pw = "aishcool3";
+	    
+	    conn = DriverManager.getConnection(db_url, db_id, db_pw);
+	    
+	    } catch (ClassNotFoundException e) {	
+			e.printStackTrace();
+			System.err.println("ojdbc6.jar 또는 경로를 체크하세요!");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.err.println("DB연결에 필요한 정보가 맞는지 체크하세요!");
+		}
+	}
+	public String getDate() {
+		String SQL = "SELECT NOW()";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				return rs.getString(1);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	public int getNext() {
+		String SQL = "SELECT ID FROM COMMUNITY ORDER BY COM_NUM DESC";
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				return rs.getInt(1) + 1;
+			}
+			return 1; // 첫 번째 게시물인 경우
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return -1; // 데이터베이스 오류
+	}
+	
+	public void close() {
+		try {
+			if(rs!=null) {
+				rs.close();
+			}
+			if(psmt!=null) {
+				psmt.close();
+			}
+			if(conn!=null) {
+				conn.close();
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public int write(UsersDTO info, String com_Title,String com_Content, String com_Category) {
+	int cnt =0;
+	getConnection();
+	//                              1       2          3           4   5         6           7             8       9          10     11    
+		//                         COM_NUM / COM_TITLE/ COM_CONTENT/ ID/ NICKNAME/COM_DATE/ COM_CATEGORY/COM_VIEWS/COM_LIKES/COM_REPORT/ROLE
+	String sql ="INSERT INTO COMMUNITY VALUES(COM_NUM_SEQ.NEXTVAL,?,?,?,?,SYSDATE,?,1,1,1,?)";
+	BoardDTO dto = new BoardDTO();
+	
+	try{
+		psmt = conn.prepareStatement(sql);
+		//email이 private이니까 get을 사용함.
+		 psmt.setString(1, com_Title);
+		 psmt.setString(2, com_Content);
+		 psmt.setString(3,  info.getId());
+		 psmt.setString(4,  info.getNickname());
+		 psmt.setString(5,  com_Category);
+		 psmt.setString(6,  info.getRole());
+		 
+		
+	
+		cnt = psmt.executeUpdate();
+	} catch(SQLException e) {
+		e.printStackTrace();
+	} finally{
+		close();
+	}
+	return cnt;
+}
+	
+	
+	public ArrayList<BoardDTO> getList(int pageNumber) {
+		String SQL = "SELECT COM_NUM, COM_TITLE, COM_CONTENT, NICKNAME, COM_DATE, COM_CATEGORY, COM_VIEWS FROM COMMUNITY WHERE ID < ? AND ORDER BY COM_NUM DESC AND FETCH FIRST 10 ROWS ONLY";
+		ArrayList<BoardDTO> list = new ArrayList<BoardDTO>();
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, getNext() - (pageNumber -1) * 10);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				BoardDTO dto = new BoardDTO();
+				dto.setCom_Num(rs.getInt(1));
+				dto.setCom_Title(rs.getString(2));
+				dto.setCom_Content(rs.getString(3));
+				dto.setNickname(rs.getString(4));
+				dto.setCom_Date(rs.getString(5));
+				dto.setCom_Category(rs.getString(6));
+				dto.setCom_Views(rs.getInt(7)); 
+				list.add(dto);
+			}			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	public boolean nextPage(int pageNumber) {
+		String SQL = "SELECT * FROM BBS WHERE COM_NUM < ? ";
+		
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, getNext() - (pageNumber -1) * 10);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+		// 게시물 보기
+		public BoardDTO getBoardDTO(int com_Num) {
+			String SQL ="SELECT COM_NUM, COM_TITLE, COM_CONTENT, NICKNAME, COM_DATE,COM_CATEGORY, COM_VIEWS, COM_LIKES, COM_REPORT FROM COMMUNITY WHERE COM_NUM=?";
+			BoardDTO dto =new BoardDTO();
+			try {
+				psmt=conn.prepareStatement(SQL);
+				psmt.setInt(1, com_Num);
+				rs = psmt.executeQuery();
+				
+				if (rs.next()) {
+					dto.setCom_Num(rs.getInt(1));
+					dto.setCom_Title(rs.getString(2));
+					dto.setCom_Content(rs.getString(4));
+					dto.setNickname(rs.getString(5));
+					dto.setCom_Date(rs.getString(6));
+					dto.setCom_Category(rs.getString(3));
+					dto.setCom_Views(rs.getInt(7));
+					dto.setCom_Likes(rs.getInt(8));
+					dto.setCom_Report(rs.getInt(9));
+		
+					
+				}			
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		
+		
+		public int update(int com_num, String com_Title, String com_Content) {
+			String SQL = "UPDATE COMMUNITY SET COM_TITLE = ?, CONTENT = ? WHERE COM_NUM =?";
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(SQL);
+				pstmt.setString(1, com_Title);
+				pstmt.setString(2, com_Content);
+				pstmt.setInt(3, com_num);
+				
+				return pstmt.executeUpdate(); 
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			return -1; // 데이터베이스 오류
+		}
+		
+		
+		public int delete(int com_Num) {
+			String SQL = "DELETE FROM COMMUNITY WHERE CON_NUM=?";
+			try {
+				PreparedStatement pstmt = conn.prepareStatement(SQL);
+				pstmt.setInt(1, com_Num);
+				
+				pstmt.executeUpdate(); 
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			return -1; // 데이터베이스 오류
+		}
+
+		
+
+}

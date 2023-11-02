@@ -1,0 +1,29 @@
+Bbs => boarddto
+
+
+
+
+css :
+
+<div style="margin-top:50px; margin-left:140px;"class="board_wrap">
+<div style="width: 450px; position: absolute; top : 350px; left: 900px;" 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

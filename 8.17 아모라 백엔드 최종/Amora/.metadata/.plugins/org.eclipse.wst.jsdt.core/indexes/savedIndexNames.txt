@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+C:\Users\gjaischool\Desktop\AMORA\code\8.17 아모라 백엔드 최종\Amora\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+694506195.index
+2462232708.index
+2645691461.index
+876435334.index
+2382670225.index
+40300975.index
